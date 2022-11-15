@@ -1,0 +1,164 @@
+% Time-stamp: <2022-11-12 21:16:37 A13258Q>
+% LateX template 
+% August 2020, Romain Lafarguette, rlafarguette@imf.org
+
+%% ---------------------------------------------------------------------------
+%% Preamble: Packages and Setup
+%% ---------------------------------------------------------------------------
+% Document class and font
+\documentclass[11pt]{article}
+
+% Language
+\usepackage[english]{babel}
+
+% Layout
+%\usepackage[margin=1in]{geometry}
+\usepackage[DIV=12]{typearea} % Page layout & margin set-up
+\usepackage{setspace} % Linespread
+\onehalfspacing % x 1,5 spacing
+
+% Font and encoding
+\usepackage[utf8]{inputenc} % For input
+\usepackage[T1]{fontenc} % For outut
+\usepackage{lmodern} % Standard LateX font
+\usepackage[babel=true]{microtype}  % "Subliminal refinements towards typographical perfection"
+\microtypesetup{final, tracking=true, kerning=true, spacing=true}
+
+% Graphics
+\usepackage{graphicx} % Insert graphics
+\usepackage{subfig} % Multiple graphs in one figure
+\graphicspath{{./figs}} % Relative paths for graphics
+
+% Tables
+\usepackage{booktabs, rotating, multirow} % Tabular rules and other macros
+
+% Floats, captions and footnotes
+\usepackage{float, caption, capt-of} 
+
+% Mathematics 
+\usepackage{amsmath, amsthm, amssymb, mathtools, bbm} % American Mathematical Society macros 
+
+% Subfiles and separate compilations
+\usepackage{subfiles}
+
+% Manage authors and affiliations
+\usepackage{authblk} % Properly align institutions name in the title page
+
+% References and hyper references 
+\usepackage{url} % Insert url
+\usepackage{natbib} % Year-name format
+\usepackage{color}  % Color package
+\definecolor{darkblue}{rgb}{0,0,0.44} % Customized color for external hyper references
+\definecolor{burgundy}{rgb}{0.5, 0.0, 0.13} % Customized color for internal hyper references
+
+% Hyperlinks in pdf
+\usepackage[pdftex]{thumbpdf} % Thumbnails
+\usepackage[%
+    bookmarks=true,   % bookmarks
+    bookmarksnumbered=false,
+    pdfpagemode=, % bookmark closed at the opening
+    pdfstartview=FitH, % all the heigth
+    pdfpagelayout=SinglePage, % perpage view
+    colorlinks=true, % Coloured links
+    breaklinks=true, % new line for too long links
+    urlcolor= darkblue, % external links color
+    citecolor=darkblue, % bibliography citations
+    linkcolor=burgundy, % Internal links color
+    pdfborder={0 0 0}   % No borders
+    ]{hyperref} % Extensive support for hypertext in LaTeX
+
+\hypersetup{% PDF metadata
+  pdftitle = {Central Bank Liquidity Forecasting},
+  pdfauthor = {Lafarguette and Panegiotelis},
+  pdfkeywords = {Liquidity Forecasting},
+  pdfsubject = {Central Banking, Forecasting},
+  pdfcreator = {Romain Lafarguette},
+  pdfproducer = {Romain Lafarguette},
+  pdfpagemode = {UseOutlines}, % When opening pdf. UseOutlines, FullScreen, etc. 
+  pdfstartview = {Fit}}
+
+% Footnote without marker, for the title
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+% A few macros: environments
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+\newenvironment{wideenumerate}{\enumerate\addtolength{\itemsep}{10pt}}{\endenumerate}
+
+%% ---------------------------------------------------------------------------
+%% Title, authors and affiliations
+%% ---------------------------------------------------------------------------
+\title{\textbf{Macrofinancial Feedback, Bank Stress Testing and Capital Surcharges}}
+
+\author[$\dag$]{Romain Lafarguette}
+\author[$*$]{Anastasios Panagiotelis}
+\author[$\S$]{Romain Veyrune}
+\affil[$\dag$]{Abu Dhabi Investment Authority}
+\affil[$*S$]{University of Sydney}
+\affil[$\S$]{International Monetary Fund}
+\date{November 2022}
+
+%% ---------------------------------------------------------------------------
+%% Begin the document
+%% ---------------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+\blfootnote{Contacts: \url{romain.lafarguette@adia.ae} \url{anastasios.panagiotelis@sydney.edu.au} \url{rveyrune@imf.org}. We thank Michael Creed, Darryl King, Nikolaos Kourentzes, Kei Moriya, Wassim Slama, for their valuable comments. The views expressed in this paper are those of the authors and do not necessarily represent those of the Abu Dhabi Investment Authority, its Management, or the International Monetary Fund, its Management, and its Executive Directors} 
+
+%% ---------------------------------------------------------------------------
+%% Abstract
+%% ---------------------------------------------------------------------------
+
+\begin{abstract}
+\noindent We develop a framework to forecast central banks' autonomous factors and compute the liquidity position.  
+\end{abstract}
+\bigskip
+
+\noindent \textbf{Keywords:} autonomous factors, time-series forecasting, central banking
+
+\medskip
+
+\noindent \textbf{JEL classification:} 
+
+%% ---------------------------------------------------------------------------
+%% Suppress page number on title page 
+%% ---------------------------------------------------------------------------
+\thispagestyle{empty} 
+\newpage
+\pagenumbering{arabic}
+
+%% ---------------------------------------------------------------------------
+%% Introduction
+%% ---------------------------------------------------------------------------
+\subfile{sections/introduction}
+
+%% ---------------------------------------------------------------------------
+%% Bibliography
+%% ---------------------------------------------------------------------------
+\newpage
+\singlespacing
+\bibliographystyle{apalike2}
+\bibliography{refs}
+
+%% ---------------------------------------------------------------------------
+%% Annex
+%% ---------------------------------------------------------------------------
+\newpage
+%\subfile{sections/annex}
+
+%% ---------------------------------------------------------------------------
+%% End the document
+%% ---------------------------------------------------------------------------
+\end{document}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
