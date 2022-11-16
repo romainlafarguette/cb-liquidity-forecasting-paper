@@ -1,4 +1,4 @@
-% Time-stamp: <2022-11-12 21:16:37 A13258Q>
+% Time-stamp: <2022-11-16 11:20:37 ubuntu>
 % LateX template 
 % August 2020, Romain Lafarguette, rlafarguette@imf.org
 
@@ -92,13 +92,13 @@
 %% ---------------------------------------------------------------------------
 %% Title, authors and affiliations
 %% ---------------------------------------------------------------------------
-\title{\textbf{Macrofinancial Feedback, Bank Stress Testing and Capital Surcharges}}
+\title{\textbf{A Forecasting Framework for Central Bank Liquidity}}
 
 \author[$\dag$]{Romain Lafarguette}
 \author[$*$]{Anastasios Panagiotelis}
 \author[$\S$]{Romain Veyrune}
 \affil[$\dag$]{Abu Dhabi Investment Authority}
-\affil[$*S$]{University of Sydney}
+\affil[$*$]{University of Sydney}
 \affil[$\S$]{International Monetary Fund}
 \date{November 2022}
 
@@ -108,14 +108,21 @@
 \begin{document}
 
 \maketitle
-\blfootnote{Contacts: \url{romain.lafarguette@adia.ae} \url{anastasios.panagiotelis@sydney.edu.au} \url{rveyrune@imf.org}. We thank Michael Creed, Darryl King, Nikolaos Kourentzes, Kei Moriya, Wassim Slama, for their valuable comments. The views expressed in this paper are those of the authors and do not necessarily represent those of the Abu Dhabi Investment Authority, its Management, or the International Monetary Fund, its Management, and its Executive Directors} 
+\blfootnote{Contacts:
+\url{romain.lafarguette@adia.ae},
+\url{anastasios.panagiotelis@sydney.edu.au}, and  \url{rveyrune@imf.org}. We  thank
+Michael Creed, Darryl King, Nikolaos Kourentzes, Kei Moriya, Wassim Slama, for
+their valuable comments and suggestions. The views expressed in this paper are
+those of the authors  and do not necessarily represent those  of the Abu Dhabi
+Investment Authority, its Management, or  the International Monetary Fund, its
+Management, and its Executive Directors.}
 
 %% ---------------------------------------------------------------------------
 %% Abstract
 %% ---------------------------------------------------------------------------
-
 \begin{abstract}
-\noindent We develop a framework to forecast central banks' autonomous factors and compute the liquidity position.  
+\noindent We develop a framework to forecast central banks' autonomous factors
+and estimate the liquidity position.
 \end{abstract}
 \bigskip
 
@@ -137,6 +144,25 @@
 %% ---------------------------------------------------------------------------
 \subfile{sections/introduction}
 
+
+%% ---------------------------------------------------------------------------
+%% Liquidity Management
+%% ---------------------------------------------------------------------------
+\subfile{sections/liquidity_management}
+
+
+%% ---------------------------------------------------------------------------
+%% Data
+%% ---------------------------------------------------------------------------
+%\subfile{sections/data}
+
+
+%% ---------------------------------------------------------------------------
+%% Empirical Strategy
+%% ---------------------------------------------------------------------------
+%\subfile{sections/empirical_strategy}
+
+
 %% ---------------------------------------------------------------------------
 %% Bibliography
 %% ---------------------------------------------------------------------------
@@ -155,7 +181,6 @@
 %% End the document
 %% ---------------------------------------------------------------------------
 \end{document}
-
 
 
 %%% Local Variables:
