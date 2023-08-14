@@ -1,0 +1,155 @@
+\section{Empirical Results}
+\label{sec:results}
+
+Forecast evaluation is carried out via an expanding window analysis. All data begin on January 3, 2016. For the first evaluation, all models are trained using available data up to and including data on July 3, 2018. One-step to 14-step ahead forecasts are then produced, i.e. from July 4, 2018 to July 17, 2018. The second evaluation rolls the window one week ahead, i.e. using all data up to and including data on July 10, 2018, forecasts for July 11,2018 to July 24, 2018 are produced. The window is expanded one week at a time up to an origin date of December 15, 2020. This gives a total of 129 origin dates (which we denote $\mathcal{T}_{\textrm{eval}}$, with 14 forecasts at each origin date. The origin dates are all on a Tuesday - a date influence by the operational context in which the Central Bank of the UAE operates.
+
+The $h$-step ahead forecast made at origin date $t$ are denoted $\hat{y}_{t+h|t}$. These are evaluated using RMSE and MAE given by
+
+\[
+\textrm{RMSE}_h=\sqrt{\frac{1}{|\mathcal{T}|}\sum_\mathcal{T}(y_t-\hat{y}_{t+h|t})^2}\,\textrm{and}\,\textrm{MAE}_h=\sqrt{\frac{1}{|\mathcal{T}|}\sum_\mathcal{T}|y_t-\hat{y}_{t+h|t}|}
+\]
+
+respectively. As a summary measure of forecasting performance over all horizons, squared and absolute errors can be averaged across forecasting horizons as well as forecast origins.
+
+Given the importance of probabilistic forecasting in liquidity management we also require forecast accuracy metrics for probabilistic forecasts. A $100\times\alpha$\% prediction intervals $(\hat{l}_{t+h|t},\hat{u}_{t+h|t})$ can be evaluated by computing the coverage, that is the proportion of times the realised value of a series is does not land within the prediction interval, over the evaluation windows. 
+
+To examine whether the differences in forecasting accuracy between different methods are statistically significant we employ the model confidence set of \citet{HanEtAl2011}. This can be interpreted in a similar fashion to a confidence interval, in the same way that a confidence interval will cover the true value of a parameter with a given probability, the model confidence set will cover the best forecasting model with a given level of probability. The model confidence sets are found using the \texttt{MCS} package in R~\citep{MCSpac} with the default settings of a 15\% Level of Signficance and 5000 bootstrap replications.
+
+%Another way to measure the forecast accuracy of prediction intervals is the Winkler score \citep{Win1972} given by
+
+%\[
+%W^{(\alpha)}_{t+h|t}=\left\{
+%\arraycolsep=1.4pt\def\arraystretch{2.2}
+%\begin{array}{ll}
+%\hat{u}_{t+h|t}-\hat{l}_{t+h|t}+\frac{2}{\alpha}(\hat{l}_{t+h|t}-y_{t+h})&\textrm{ if }y_{t+h}<\hat{l}_{t+h|t}\\
+%\hat{u}_{t+h|t}-\hat{l}_{t+h|t}&\textrm{ if }\hat{l}_{t+h|t}\leq y_{t+h}\leq\hat{u}_{t+h|t}\\
+%\hat{u}_{t+h|t}-\hat{l}_{t+h|t}+\frac{2}{\alpha}(y_{t+h|t}%-\hat{u}_{t+h})&\textrm{ if }y_{t+h}>\hat{u}_{t+h|t}
+%\end{array}\right.
+%\]
+
+%These can be averaged over the evaluation windows, or over the different forecast horizons to get an overall measure of the accuracy of interval forecasts.
+
+
+Table~\ref{tab:cicsum} shows MAE of currency in circulation for 1-day ahead, 7-day ahead and 14-day ahead forecasts. At a 1-day horizon and 7-day horizon, the best performing methods are the model averages, however, the differences between models are quite small - the model confidence set contains all models. However at a 14-day horizon, the best performing model is the ARIMA with regression. Only this model, and the model average of the two best models are included in the model confidence set. This indicates the importance of modelling seasonality and events allowed in the regression model with ARIMA errors, especially at a two week horizon.
+
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Sun May 29 14:13:46 2022
+\begin{table}[!ht]
+\centering
+\begin{tabular}{lrrr}
+  \hline
+Method & h=1 & h=7 & h=14 \\ 
+  \hline
+SES & 379 & 2121 & 3234 \\ 
+  ETS & \textbf{363} & \textbf{2098} & 3188 \\ 
+  ARIMA & \textbf{359} & \textbf{2012} & 2813 \\ 
+  SARIMA & \textbf{378} & \textbf{2223} & 3891 \\ 
+  SARIMA Reg. & \textbf{389} & \textbf{1890} & \textbf{2579} \\ 
+  TBATS & \textbf{355} & \textbf{2039} & 2786 \\ 
+  MA-all & \textbf{340} & \textbf{1865} & 2809 \\ 
+  MA-best2 & \textbf{346} & \textbf{1854} & \textbf{2537} \\ 
+   \hline
+\end{tabular}
+\caption{MAE at different forecast horizons (h) for currency in circulation. The methods are Simple Exponential Smoothing (SES), ETS, ARIMA, Seasonal ARIMA (SARIMA), a seasonal ARIMA with regressors for events and trigonometric seasonality (SARIMA Reg.), and two model averages, one an equally weighted average of all models (MA-all), and the other a equally weighted average of the best 2 models (MA-best2). Entries in \textbf{bold} indicate all models in the model confidence set.} 
+\label{tab:cicsum}
+\end{table}
+
+Table~\ref{tab:sabsum} shows the results for State Account Balance. For this data the ARIMA models, including ARIMA with regression perform poorly at a 1-day horizon with TBATS and a model average performing best, and exponential smoothing methods within the model confidence set. At longer horizons the TBATS model performs well, although it should be noted that at a 7-day and 14-day horizon, it is difficult to distringuish between models with only simple exponential smoothing excluded from the model confidence set.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{lrrr}
+  \hline
+Method & h=1 & h=7 & h=14 \\ 
+  \hline
+Simple Exponential Smoothing & \textbf{667} & 1725 & 2010 \\ 
+  ETS & \textbf{687} & \textbf{1743} & \textbf{2059} \\ 
+  ARIMA & 814 & \textbf{1766} & \textbf{2025} \\ 
+  Seasonal ARIMA & 803 & \textbf{1862} & \textbf{1961} \\ 
+  SARIMA trig events & 829 & \textbf{1652} & \textbf{1807} \\ 
+  TBATS & \textbf{731} & \textbf{1553} & \textbf{1724 }\\ 
+  Model Average (all models) & \textbf{728} & \textbf{1604} & \textbf{1845} \\ 
+  Model Average (best 2) & \textbf{684} & \textbf{1567} & \textbf{1801} \\ 
+   \hline
+\end{tabular}
+\caption{MAE at different forecast horizons (h) for state account balance. The methods are Simple Exponential Smoothing (SES), ETS, ARIMA, Seasonal ARIMA (SARIMA), a seasonal ARIMA with regressors for events and trigonometric seasonality (SARIMA Reg.), and two model averages, one an equally weighted average of all models (MA-all), and the other a equally weighted average of the best 2 models (MA-best2). Entries in \textbf{bold} indicate all models in the model confidence set.} 
+\label{tab:sabsum}
+\end{table}
+
+Regarding Net Foreign Assets and net liquidity due to autonomous factors, conditional volatility is the dominant feature of these series. Therefore it makes more sense to report the coverage of 95\% prediction intervals for these series. Table~\ref{tab:nfasum} reports these for net foreign assets. All models achieve coverage close to the desired rate of 95\%, with a GARCH model and an model average performing slightly better than the alternatives across all forecast horizons. Table~\ref{tab:aggsum} shows the same results for net liquidity due to autonomous factors. Again, all models achieve coverage rates close to 95\% with the model averages performing relatively well. It should be noted testing for significant differences in coverage rates will lack power due to the small number of evaluation periods in this empirical study.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{lrrr}
+  \hline
+Method & h=1 & h=7 & h=14 \\ 
+  \hline
+EWMA & 0.9250 & 0.9250 & 0.9083 \\ 
+  GARCH & \textbf{0.9500} & \textbf{0.9417} & \textbf{0.9333} \\ 
+  GJR-GARCH & \textbf{0.9500} & 0.9333 & 0.\textbf{9333} \\ 
+  E-GARCH & 0.9333 & \textbf{0.9417} & \textbf{0.9333} \\ 
+  MA-all & \textbf{0.9583} & \textbf{0.9417} & \textbf{0.9333} \\ 
+  MA-best2 & 0.9333 & 0.9333 & 0.9167 \\ 
+   \hline
+\end{tabular}
+\caption{Coverage of 95\% prediction intervals at different forecast horizons (h) for net foreign assets. The methods are Exponentially Weighted Moving Average (EWMA), GARCH, GJR-GARCH, E-GARCH (SES), and two model averages, one an equally weighted average of all models (MA-all), and the other a equally weighted average of the best 2 models (MA-best2). Entries in \textbf{bold} are those closest to 0.95.} \label{tab:nfasum}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{lrrr}
+  \hline
+Method & h=1 & h=7 & h=14 \\ 
+  \hline
+EWMA & 0.9302 & 0.9380 & 0.9302 \\ 
+  GARCH & 0.9302 & \textbf{0.9535} & 0.9457 \\ 
+  GJR-GARCH & \textbf{0.9380 }& \textbf{0.9535} & 0.9457 \\ 
+  E-GARCH & 0.9147 & 0.9612 & 0.9380 \\ 
+  MA-all &\textbf{ 0.9380} & 0.9612 & 0.9380 \\ 
+  MA-best2 & \textbf{0.9380} & 0.9612 & \textbf{0.9535} \\ 
+   \hline
+\end{tabular}
+\caption{Coverage of 95\% prediction intervals at different forecast horizons (h) for net liquidity due to autonomous factors. The methods are Exponentially Weighted Moving Average (EWMA), GARCH, GJR-GARCH, E-GARCH (SES), and two model averages, one an equally weighted average of all models (MA-all), and the other a equally weighted average of the best 2 models (MA-best2). Entries in \textbf{bold} are those closest to 0.95.} \label{tab:aggsum}
+\end{table}
+
+In addition to the forecasts from individual models, we also consider forecast reconciliation methods discussed in Section~\ref{sec:forereco}. For this evaluation we consider the regression model with ARMA errors for CIC, Simple Exponential Smoothing for SAB, an e-GARCH model for NFA and a GJR-GARCH model for AGG. Table~\ref{tab:reco} summarises the mean absolute errors for each series. The results are quite mixed, reconciliation does not guarantee an improvement in forecast accuracy for all factors at all horizons. However, there are instances where reconciliation methods lead to improved forecast accuracy. The forecast of the aggregate improves at a short horizon using the MinT method, and at a long horizon using OLS. The currency in circulation forecast can be improved at a short horizon using OLS reconciliation. Net foreign asset forecasts improve across all horizons using the OLS method. In the meantime the state account balance forecasts are not improved by using reconciliation. This result is consistent with theoretical evidence that while reconciliation can improve forecasting accuracy overall, these improvements are not guaranteed to occur for all series~\citep{PanEtAl2021}. Nonetheless, reconciliation does improve forecasts for some series/ forecasting horizons and most importantly ensures that forecasts are coherent, that is they respect the constraint AGG=NFA-(CIC+SAB).
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|l|rrr}
+  \hline\hline
+Autonomous Factor & Method & MAE (h=1) & MAE (h=7) & MAE (h=14) \\ 
+  \hline
+\multirow{4}{*}{Net Liquidity}&Base (Unreconciled) & 1760.32 & \textbf{4301.35} & 5724.03 \\ 
+ & Bottom Up & 1807.91 & 4451.54 & 5902.34 \\ 
+ & MinT & \textbf{1753.49} & 4397.29 & 5767.77 \\ 
+  &OLS & 1768.10 & 4306.73 & \textbf{5715.94} \\ 
+  \hline
+\multirow{4}{*}{Currency in Circulation}  &Base (Unreconciled) & 377.69 & \textbf{1878.46} &\textbf{ 2567.23} \\ 
+  &Bottom Up & 377.69 & \textbf{1878.46} & \textbf{2567.23 }\\ 
+  &MinT & 375.61 & 1890.23 & 2583.85 \\ 
+  &OLS & \textbf{368.58} & 1889.95 & 2584.56 \\ 
+  \hline
+\multirow{4}{*}{Net Foreign Assets}  &Base (Unreconciled) & 1423.02 & 4092.57 & 5643.08 \\ 
+  &Bottom Up & 1423.02 & 4092.57 & 5643.08 \\ 
+  &MinT & 1441.80 & 4131.70 & 5596.20 \\ 
+  &OLS & \textbf{1404.91} & \textbf{3976.77} & \textbf{5500.73} \\ 
+  \hline
+\multirow{4}{*}{State Account Balance}  &Base (Unreconciled) & \textbf{666.86} &\textbf{ 1724.99} & \textbf{2009.55} \\ 
+  &Bottom Up & \textbf{666.86} & \textbf{1724.99 }& \textbf{2009.55} \\ 
+  &MinT & 742.11 & 2386.69 & 3140.85 \\ 
+  &OLS & 682.95 & 1907.88 & 2284.66 \\ 
+   \hline\hline
+\end{tabular}
+\caption{MAE for all series at different forecast horizons using different reconciliation methods.} 
+\label{tab:reco}
+\end{table}
+
+\section{Conclusion}\label{sec:conc}
+
+Our forecast evaluation provides guide to the econometric and statistical models that can be used for forecasting autonomous liquidity factors measured at a daily frequency. The influence of calendar effects and seasonal patterns that can be captured via regression modelling is shown to be of particular importance for forecasting currency in circulation especially at longer horizons. For state account balance, exponential smoothing techniques, including the TBATS approach that allows for multiple seasonalities, outperform ARMA models. For net foreign assets and the aggregate series, models for conditional heteroskedasticity that allow for an asymmetric response of volatility such as E-GARCH and GJR-GARCH can be used. It should be noted that these conclusions apply to a single country during a single period of time, and that the modelling approaches used should be constantly evaluated and updated. Model combination is an alternative approach to robustify against the choice of model, and is shown here to produce competitive results. Finally, reconciliation methods are shown to improve the forecasts of some series, and guarantee that forecasts of the net liquidity is coherent with forecasts of individual autonomous factors.
+
+Further research could involve expanding the set of models considered for forecasting, including using regularisation approaches for selecting seasonal predictors for CIC and SAB and stochastic volatility models for NFA and net liquidity due to autonomous factors. Since risk management is an important feature of central bank operations, forecasts of quantitites such as Value at Risk and Expected Shortfall could also be considered. This will forecast reconciliation procedures to be extended to probabilistic forecasts with the work of \citet{PanEtAl2020} providing a promising avenue for doing so.
+
+
+

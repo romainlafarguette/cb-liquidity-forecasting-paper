@@ -1,0 +1,163 @@
+\section{Empirical Strategy}
+\label{sec:empiricalstrategy}
+
+
+We now give a brief description to modelling approaches that can be used for forecasting autonomous factors. As a reference to the general model classes described below see \cite{HynAth2021} and (for conditional volatility models) \citet{Tsay2005}. Throughout, $y_t$ denotes the value of an autonomous factor at time $t$, $\hat{y}_{t+h}$ denotes the $h$ day ahead forecast of an autonomous factor, made at time $t$, $m$ denotes the seasonal period (in our context $m=7$ for each day of the week) and $k$ is the integer part of $(h-1)/m$
+
+%\subsection{Na\"ive Forecasts}
+
+%The naive forecast is given by the last available value of the time series i.e $\hat{y}_{t+h}^{Naive}=y_{t}$. Alternatively for series with a weekly pattern (such as CIC) the last value available observed on the same day of the week of the previous period i.e., $\hat{y}_{t+h}^{SNaive}=y_{t+h-m(k+1)}$
+
+\subsection{Exponential Smoothing}
+
+ETS models are a class of models that employ exponential smoothing with trend and seasonal components \citep[see][for details]{HynEtAl2008}. The level, trend and seasonal components at time $t$ are given by $l_t$, $b_t$ and $s_t$ respectively. Equations for forecasts and for updating the components are given by
+
+\begin{align}
+\hat{y}_{t+h}&=l_t+hb_t+s_{t+h-m(k+1)}\\
+l_t&=\alpha (y_t-s_{t-m})+(1-\alpha)(l_{t-1}+{b_{t-1}})\\
+b_t&=\beta (l_t-l_{t-1})+(1-\beta)b_{t-1}\\
+s_t&=\gamma (y_t-l_{t-1}-b_{t-1})+(1-\gamma)s_{t-1}\,,
+\end{align}
+
+where $\alpha$, $\beta$ and $\gamma$ are parameters that control the smoothness of the level, trend and seasonal components respectively that can be estimated by maximum likelihood. The model can be extended to allow for  multiplicative trends (with or without damping) seasonal components, and errors. Depending on the components included and whether they are additive or multiplicative, leads to 30 possible model specifications. All specifications are fit and the model with the lowest corrected Akaike Information Critrion (AICc) given by
+
+$$-2lnL+\frac{2q(q+1)}{T-q-1}$$
+
+where $q$  is the number of model parameters and $T$ is the size of the training sample, is chosen. The \texttt{ets} function in the \texttt{forecast} package \citep{ForPac} in the R programming environment \citep{R2020}.
+
+\subsection{ARIMA}
+
+The ARIMA class of models take the form
+
+\[(1-\phi(L))(1-L)^d(y_t-\mu)=(1+\theta(L))\epsilon_t\]
+
+where $d$ is the degree of differencing, $L$ is the lag operator, $\phi(L)=\phi_1L+\phi_2L^2+\dots+\phi_pL^p$ is a lag polynomial of AR parameters and $\theta(L)=\theta_1L+\theta_2L^2+\dots+\theta_qL^q$ is a lag polynomial of MA parameters.
+
+The auto arima algorithm \citep{HynKha2008} can be used to select to orders $p$, $q$ and $d$. First the degree of differencing $d$ is determined by the sequqntial application of the KPSS test for stationarity. Then using the differenced data, an AR(1), AR(2) and ARMA(2,2) are fit. Starting from the model that minimises AICc, a search amongst neighboring models (i.e. models with $p$ or $q$ that differ by one from the current best model) is used to determing $p$ ad $q$.
+
+For seasonal data, a seasonal ARIMA
+
+\[(1-\phi(L))(1-\Phi(L^m))(1-L)^d(1-L^m)^D(y_t-\mu)=(1+\theta(L))(1-\Theta(L^m))\epsilon_t
+\]
+
+can be used instead, where $P$, $D$ and $Q$ are the orders of the seasonal AR polynomial, differencing and MA polynomial respectively. The auto arima algorithm can be modified to account for seasonality. This is implemented by the \texttt{auto.arima} function of the \texttt{forecast} package
+
+\subsection{ARIMA with regression}
+
+To capture the effects of holidays as well as longer seasonal patterns (e.g. yearly patterns) ARIMA models can be combined with regression. In particular, regression models are fit (possibly after differencing) with the errors then assumed to follow an ARMA process. The following regressors are considered in our modelling framework
+
+\subsubsection{Day of Week Dummies}
+
+Dummy variables can be used to capture weekly patterns in the data. This is particularly well suited to cases where the weekly pattern remains the same over the entire time series. It is less well suited when the seasonality varies over time, in which case seasonal ARIMA models may be more appropriate.
+
+\subsubsection{Fourier Terms}
+
+To capture smooth effects that take place over a longer seasonal period, Fourier terms can be used. These come in pairs and take the form
+\[
+x_{j,t}^{(c)}=\cos(2\pi jt/m)\textrm{  and  } x_{j,t}^{(s)}=\sin(2\pi jt/m)
+\]
+
+for $j=1,\dots,J$ and where $m$ is a longer seasonal period such as $m=365$ (days in the year). For countries with a majority Muslim population $m=354$ can be used to capture the effect of religious events (e.g. Ramadan) as well as religious holidays (e.g. Eid al Adha, Eid al Fitr) that move relative to the Gregorian calendar. In the case of the UAE, we construct Fourier terms based on four seasonal periods, $m=30$ roughly corresponding to monthly effects, $m=90$ roughly corresponding to quarterly effects, and $m=354$ and $m=365$ corresponding to the religious and civic year respectively.
+
+\subsubsection{Holiday effects}
+
+A standard approach to modelling the effects of holidays is to use dummy variables, which would capture a spike in an autonomous factor on a holiday. However, in the case of forecasting CIC in particular, what is more commonly observed is a ramping up of CIC for a week before a holiday, before a ramping down of CIC for a week after the holiday. This is captured by constructing the following covariate
+
+\[
+x_t^{(h)}=\max\left(\underset{t^*\in\mathcal{T}_{hol}}{\max}\left(\frac{t^*-t}{7}\right)^2,0\right)
+\]
+
+where $\mathcal{T}_{hol}$ is a set of all $t$ such that day $t$ is a public holiday. If there is a public holiday within 7 days of day $t$, the term $t^*-t$ measures the amount of days before/after a holiday. This creates a small quadratic hump around each holiday (and bears some similarities with the Prophet model \citep{TayLet2018} which uses a Gaussian density). For days that do not occur within a week of a public holiday $x_t^{(h)}=0$.
+
+\subsubsection{Structural Breaks}
+
+Two forms of structural breaks are often observed in autonomous factors. A transitory structural break sees a change in the level of a series for a short period. In this case dummies can be used equal to 1 for the duration of the transitory structural break and 0 otherwise. This is implemented in the case of the State Account Balance for the UAE, with a transitory break starting on March 23, 2020 and ending on April 1, 2020. Alternatively there are permanent structural breaks which see a sustained change in the level of an autonomous factor. These are modelled using dummy variables set to zero before the structural break and one after the structural break. In the case of the UAE, this was implemented for the CIC data from the March 17, 2020.
+
+\subsubsection{Predictor Selection in Regression}
+
+Since only a small number of groups of regressors are considered, covariates can be chosen by an exhaustive search. To clarify, blocks of day of week dummies, Fourier terms (for each seasonal frequency), holiday dummies and structural break dummies, are either included or excluded all at once, leading to $2^4=16$ model specifications. For each both non-seasonal and seasonal ARIMA errors are considered with the auto arima algorithm used to select the ARIMA orders. The model with the lowest AIC overall is then selected. An alternative to this approach would be to carry out a LASSO to conduct variable selection, or, if the blocked structure of predictors is to be preserved, then a blocked LASSO can be used instead. An advantage of an exhaustive search is that it allows the regression specification and ARIMA specification for the errors to be chosen simultaneously - although it should be noted that an exhaustive search can be computationally demanding.
+
+\subsection{TBATS}
+
+The TBATS model \citep{DeLEtAl2011} is a form of exponential smoothing model with a number of additional features. Seasonality evolves according to Fourier terms (similar to those used in the regression model), the series is transformed by a Box-Cox transformation (which includes the log transformation as a limiting case) and the errors of the model follow an ARMA model. The main advantage of this model is that multiple seasonal components can be used accounting for seasonality with different periodicities. This is particularly useful in countries where civic and religious calendars may differ for example, in countries with a majority Muslim population. For the UAE, TBATS is implemented with seasonal periods of $m=7,30,90,354,365$, roughly corresponding to days in a week, month, quarter, religious year and civic year.
+
+\subsection{Conditional Heteroskedasticity models}
+
+Net foreign assets and the aggregate series tend to resemble series on asset prices, with conditional heteroskedasticity in the difference of these series a major feature. To capture this we consider models in the GARCH family of distributions. All models for conditional volaitlity were implemented using the \texttt{rugarch} package in R~\citep{rugpac}. The standard GARCH specification \citep{Bol1986} is given by
+
+\begin{align}
+  u_t&=\sigma_t\epsilon_t\\
+  \sigma_t^2&=\omega+\alpha_1u^2_{t-1}+\dots+\alpha_pu^2_{t-p}+\beta_1\sigma^2_{t-1}+\dots+\beta_q\sigma^2_{t-q}
+\end{align}
+
+where $u_t$ are demeaned changes in net foreign assets and $\epsilon_t$ is white noise with zero mean and unit variance. In modelling NFA, we consider a GARCH(1,1) specification where $p=q=1$. This model is estimated by (quasi-)maximum likelihood under the assumption that $\epsilon_t$ is normally distributed. Both stationarity and enforcing that variances are positive impose certain constraints on these parameters.
+
+An special case of the GARCH(1,1) model that is non-stationary in given by the EWMA process 
+
+\begin{align}
+  u_t&=\sigma_t\epsilon_t\\
+  \sigma_t^2&=\lambda u^2_{t-1}(1-\lambda)\sigma^2_{t-1}
+\end{align}
+
+which is a form of simple exponential smoothing for the variance rather than the mean process. An extension of the GARCH(1,1) model is the GJR-GARCH(1,1) model \citep{GloEtAl1993}
+
+\begin{align}
+  u_t&=\sigma_t\epsilon_t\\
+  \sigma_t^2&=\omega+\alpha u^2_{t-1}+\gamma I(u_t>0)u^2_{t-1}\beta\sigma^2_{t-1}
+\end{align}
+
+The rationale behind the GJR-GARCH model is that the response of volatility will be stronger following a negative change in the variable rather than a positive change.
+
+The final model we consider for conditional heteroskedasticity is the EGARCH(1,1) model \cite{Nel1991} given by
+
+\begin{align}
+  u_t&=\sigma_t\epsilon_t\\
+  \ln(\sigma_t^2)&=\omega+\alpha \left(|\epsilon_{t-1}|+\gamma\epsilon_{t-1}\right)+\beta\ln(\sigma^2_{t-1})
+\end{align}
+
+An advantage of the EGARCH model is that the parameters do not need to be constrained in a way that ensures positive variances since all modelling of the variance takes place on the log scale. 
+
+\subsection{Model Averaging}
+
+It is well established in the forecasting literature that combining forecasts from different classes of models can improve forecast accuracy~\citep{Tim2006}. While there is a long literature on finding optimal weights, even weights tend to perform more robustly since there is no additional uncertainty introduced by having to estimate combination weights~\citep{SmiWal2009}. As well as considering an equally weighted combination of all classes of models outlined above, we also consider trimming models by only taking the best $K$ models. For this studey we consider $K=2$.%Trimming can also be achieved using model confidence sets \citep{SamSek2017} so that all models not found to perform significantly worse that the best model are used to combine forecasts.
+
+\subsection{Forecast Reconciliation}\label{sec:forereco}
+
+When forecasts are generated for the autonomous factors (CIC, SAB and NFA) as well as AGG, there is no guarantee that forecasts respect the aggregation relationship $AGG=NFA-(CIC+SAB)$. To address this issue, different approaches can be used. As a benchmark, consider the case of ignoring that forecasts do not aggregate correctly, this is known as a 'base' or unreconciled forecast. In the following it is convenient to stack these base forecasts in a vector
+
+\[
+\hat{\boldmath{y}}_t=\begin{pmatrix}\hat{\textrm{AGG}}_t\\
+\hat{\textrm{CIC}}_t\\
+\hat{\textrm{SAB}}_t\\
+\hat{\textrm{NFA}}_t\end{pmatrix}
+\]
+
+The first approach to achieve coherent forecasts is to ignore the base forecast of the aggregate and instead simply compute an aggreagate forecast as 
+$\hat{\textrm{NFA}}_t-(\hat{\textrm{CIC}}_t+\hat{\textrm{SAB}}_t)$. This is known as a bottom up approach. A more modern approach that does uses forecasts at all levels is forecast reconciliation.
+
+Reconciliation methods require defining a matrix which in the case of autonomous factors is given by
+
+\[
+\mathbf{S}=\begin{pmatrix} -1 & -1 & 1\\
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1\\
+\end{pmatrix}
+\]
+
+The first row of this matrix encodes the relationship between net liquidity and the autonomous factors. The second approach to obtain coherent forecasts is the so called OLS method of reconciliation \citep{HynEtAl2011} given by
+
+\[
+\tilde{\mathbf{y}}=\mathbf{S}\left(\mathbf{S}'\mathbf{S}\right)^{-1}\mathbf{S}'\hat{\mathbf{y}}
+\]
+
+By construction the reconciled forecasts $\tilde{\mathbf{y}}$ will cohere to the aggregation constraint.
+
+The third way used to obtain coherent forecasts is an improvement on OLS reconciliation, known as the Minimum Trace (MinT) method\citep{WicEtAl2019}.  This method accounts for covariance in the forecasting errors of each autonomous factor. Reconciled forecasts using the the MinT method are given by
+
+\[
+\tilde{\mathbf{y}}=\mathbf{S}\left(\mathbf{S}'\boldsymbol{\Sigma}^{-1}\mathbf{S}\right)^{-1}\mathbf{S}'\boldsymbol{\Sigma}^{-1}\hat{\mathbf{y}}
+\]
+
+The covariance matrix $\boldsymbol{\Sigma}$ is estimated using the residuals from the models for each autonomous factor.
+

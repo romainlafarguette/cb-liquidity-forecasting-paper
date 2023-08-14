@@ -1,0 +1,198 @@
+%% Time-stamp: <2023-08-14 21:00:33 A13258>
+%% This version : August 2023
+%% Article main class
+%% https://romainlafarguette.github.io/
+
+%% ---------------------------------------------------------------------------
+%% Document class 
+%% ---------------------------------------------------------------------------
+\documentclass{article}
+
+%% ---------------------------------------------------------------------------
+%% Packages
+%% ---------------------------------------------------------------------------
+
+%% Graphics ------------------------------------------------------------------
+\usepackage{geometry}
+\usepackage{graphicx}
+\graphicspath{{figures/}} 
+
+% default: pdfLaTeX
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage[babel=true]{microtype}
+\microtypesetup{final,tracking=true,kerning=true,spacing=true}
+
+%% Layout --------------------------------------------------------------------
+\usepackage[DIV=10]{typearea} %% Page layout & margin set-up
+\usepackage{setspace} %% Linespread
+\onehalfspacing %% x 1,5 spacing
+
+%% Tables --------------------------------------------------------------------
+\usepackage{booktabs,rotating,multirow,pdflscape} %% Tabular rules and other macros
+\usepackage{afterpage} %% Afterpage and tables footnote
+\usepackage{caption} 
+\usepackage{capt-of}% or use the larger `caption` package
+\captionsetup[table]{skip=10pt} % Increase the space between caption and table
+\captionsetup[figure]{skip=20pt} % Increase the space between caption and figure
+
+\newcommand*{\myalign}[2]{\multicolumn{1}{#1}{#2}} %% Modify alignment for a single cell
+
+%% Redefine the font size for all tables in the document
+\usepackage[capposition=top]{floatrow} % Add a note below a float
+\DeclareFloatFont{tiny}{\tiny}% "scriptsize" is defined by floatrow, "tiny" not
+\floatsetup[table]{font=footnotesize}
+
+%% Force the caption to be on top + possibility to have notes under captions
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+\restylefloat{figure}
+
+%% Write note below the tables
+\usepackage[flushleft]{threeparttable}
+
+%% Mathematics ---------------------------------------------------------------
+\usepackage{amsmath, amsthm, amssymb, dsfont} %% American Mathematical Society macros + Misc
+
+%% References and hyper references -------------------------------------------
+\usepackage{color}  %% Color package
+\usepackage{natbib} %% Author-year bibliography style
+\definecolor{darkblue}{rgb}{0,0,0.44} % Customized color for hyper references
+
+\usepackage[pdftex]{thumbpdf} % Thumbnails
+\usepackage[                %
+    bookmarks         = true,   % bookmarks
+    bookmarksnumbered = false,
+    pdfpagemode = None, % bookmark closed at the opening
+    pdfstartview = FitH,% all the heigth
+    pdfpagelayout = SinglePage,% perpage view
+    colorlinks = true,% % Coloured links
+    breaklinks =true, % new line for too long links
+    urlcolor   = darkblue, % external links color
+    citecolor  = darkblue, %
+    linkcolor  = darkblue, %% Internal links color
+    pdfborder  = {0 0 0}%   % No borders
+    ]{hyperref} % Extensive support for hypertext in LaTeX
+
+\hypersetup{ %% PDF metadata
+  pdftitle = {Forecasting Central Bank Liquidity},
+  pdfauthor = {Romain Lafarguette, Amine Raboun, Anastasios Panageotelis},
+  pdfkeywords = {Autonomous factors, central bank balance sheet, time series models},
+  pdfsubject = {International Finance},
+  pdfcreator = {Romain Lafarguette and Amine Raboun},
+  pdfproducer = {Romain Lafarguette and Amine Raboun},
+  pdfpagemode = {UseOutlines}, %% use {FullScreen} to start in full screen
+  pdfstartview = {Fit}}
+
+%% Misc --------------------------------------------------------------------
+\usepackage{authblk} % Affiliation
+\usepackage{natbib} % Bibliography styles
+
+%% ---------------------------------------------------------------------------
+%% Begin the document
+%% ---------------------------------------------------------------------------
+\begin{document}
+
+\title{Forecasting Central Bank Liquidity: A Comprehensive Statistical Framework\thanks{
+    Contacts:  romain.lafarguette@adia.ae,
+amine.raboune@adia.ae and anastasios.panagiotelis@sydney.edu.au. We would like to thank: the staff of the central banks
+of the  following countries:  Algeria, Djibouti, Jordan,  Mauritania, Namibia, Tunisia, 
+UAE;  participants of  the workshop  on  liquidity forecasting  taugth in  the
+Singapore  Training  institute;  as  well as  Darryl  King,  Bernard  Laurens,
+Nikolaos Kourentzes, Etienne Vaccaro-Grange, Romain Veyrune}}
+
+\author[$\ddag$]{Romain Lafarguette}
+\author[$\ddag$]{Amine Raboun}
+\author[*]{Anatastios Panagiotelis}
+\affil[$\ddag$]{Abu Dhabi Investment Authority}
+\affil[*]{University of Sydney}
+\date{August 2023}
+\maketitle
+
+\begin{abstract}          
+Central  banks  with active  liquidity  management  need to  conduct  monetary
+operations to anchor the level of  banks' reserves held on their balance sheet
+(the  "\emph{systemic  liquidity}").   To  this end,  central  banks  need  to
+forecast  their autonomous  factors,  i.e. the  the items  of  a central  bank
+balance sheet that the  central bank has no control upon,  such as currency in
+circulation,  government  deposits  and,   for  some  central  banks,  foreign
+assets.\\
+
+This paper presents a comprehensive  statistical framework for forecasting the
+central bank  autonomous factors,  encompassing models  estimation, validation
+and forecasts reconciliation. The framework  relies on a data-driven approach,
+that  estimates  a   battery  of  model  and  combine  those   with  the  best
+out-of-sample performance. The  empirical strategy is designed  to be flexible
+and adaptable to new dynamics and structural breaks.\\
+
+This  paper  also offers  and  in-depth  user-guide  of the  companion  Python
+package, deployed  to automatize this  framework. This toolkit is  designed to
+support  central banks  to implement  modern statistical  techniques in  their
+daily liquidity forecasts.\\
+\end{abstract}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Introduction
+%% ---------------------------------------------------------------------------
+\input{part_01_introduction.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Conceptual section
+%% ---------------------------------------------------------------------------
+\input{part_02_concept.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Data
+%% ---------------------------------------------------------------------------
+\input{part_03_data.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Models
+%% ---------------------------------------------------------------------------
+\input{part_04_models.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Results
+%% ---------------------------------------------------------------------------
+\input{part_05_results.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Conclusion
+%% ---------------------------------------------------------------------------
+\input{part_06_conclusion.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Bibliography
+%% ---------------------------------------------------------------------------
+\bibliography{references}
+\bibliographystyle{apalike}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Annexes
+%% ---------------------------------------------------------------------------
+\appendix
+
+%% ---------------------------------------------------------------------------
+%% Annex 1: Extra results
+%% ---------------------------------------------------------------------------
+\input{annex_01_extra_results.tex}
+\newpage
+
+%% ---------------------------------------------------------------------------
+%% Annex 2: Software
+%% ---------------------------------------------------------------------------
+\input{annex_02_software.tex}
+\newpage
+
+\end{document}
+
